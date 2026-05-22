@@ -12,8 +12,10 @@ function Projects() {
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
 
-  useEffect(() => {
-    axios.get('https://ai-bug-tracker-omega.vercel.app/api/projects', { headers })
+ useEffect(() => {
+    const token = localStorage.getItem('token');
+    const h = { Authorization: `Bearer ${token}` };
+    axios.get('https://ai-bug-tracker-omega.vercel.app/api/projects', { headers: h })
       .then(res => setProjects(res.data))
       .catch(err => console.log(err));
   }, []);

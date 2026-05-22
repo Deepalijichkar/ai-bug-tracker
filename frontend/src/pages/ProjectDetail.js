@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
+const API = 'https://ai-bug-tracker-omega.vercel.app';
 
 function ProjectDetail() {
   const { id } = useParams();
@@ -10,20 +12,23 @@ function ProjectDetail() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
 
-  const token = localStorage.getItem('token');
-  const headers = { Authorization: `Bearer ${token}` };
+  const getHeaders = useCallback(() => {
+    const token = localStorage.getItem('token');
+    return { Authorization: `Bearer ${token}` };
+  }, []);
 
   useEffect(() => {
-    axios.get(`https://ai-bug-tracker-omega.vercel.app/api/projects/${id}`, { headers })
+    const headers = getHeaders();
+    axios.get(`${API}/api/projects/${id}`, { headers })
       .then(res => setProject(res.data));
-    axios.get(`https://ai-bug-tracker-omega.vercel.app/api/bugs?project=${id}`, { headers })
+    axios.get(`${API}/api/bugs?project=${id}`, { headers })
       .then(res => setBugs(res.data));
-  }, [id]);
+  }, [id, getHeaders]);
 
   const addMember = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`https://ai-bug-tracker-omega.vercel.app/api/projects/${id}/members`, { email }, { headers });
+      const res = await axios.post(`${API}/api/projects/${id}/members`, { email }, { headers: getHeaders() });
       setProject(res.data);
       setEmail('');
       setMessage('Member added successfully!');
@@ -41,7 +46,6 @@ function ProjectDetail() {
   return (
     <div>
       <button onClick={() => navigate('/projects')} style={styles.back}>← Back to Projects</button>
-
       <div style={styles.header}>
         <div>
           <h1 style={{ margin: 0 }}>📁 {project.name}</h1>
@@ -49,7 +53,6 @@ function ProjectDetail() {
         </div>
         <button onClick={() => navigate(`/create?project=${id}`)} style={styles.button}>+ New Bug</button>
       </div>
-
       <div style={styles.grid}>
         <div style={styles.mainSection}>
           <h2 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Bugs ({bugs.length})</h2>
@@ -70,7 +73,6 @@ function ProjectDetail() {
             </div>
           ))}
         </div>
-
         <div>
           <div style={styles.sideCard}>
             <h3 style={{ marginBottom: '1rem', fontSize: '1rem' }}>👥 Team Members</h3>
@@ -87,22 +89,12 @@ function ProjectDetail() {
               </div>
             ))}
           </div>
-
           <div style={styles.sideCard}>
             <h3 style={{ marginBottom: '1rem', fontSize: '1rem' }}>➕ Invite Member</h3>
             {message && <p style={{ color: message.includes('success') ? '#22c55e' : '#ef4444', fontSize: '0.85rem', marginBottom: '0.5rem' }}>{message}</p>}
             <form onSubmit={addMember}>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="teammate@email.com"
-                required
-                style={styles.input}
-              />
-              <button type="submit" style={{ ...styles.button, width: '100%', marginTop: '0.5rem' }}>
-                Invite
-              </button>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="teammate@email.com" required style={styles.input} />
+              <button type="submit" style={{ ...styles.button, width: '100%', marginTop: '0.5rem' }}>Invite</button>
             </form>
           </div>
         </div>
