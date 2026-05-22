@@ -12,14 +12,14 @@ function Projects() {
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
 
- useEffect(() => {
+useEffect(() => {
     const token = localStorage.getItem('token');
     const h = { Authorization: `Bearer ${token}` };
     axios.get('https://ai-bug-tracker-omega.vercel.app/api/projects', { headers: h })
       .then(res => setProjects(res.data))
       .catch(err => console.log(err));
+    // eslint-disable-next-line
   }, []);
-
   const handleCreate = async (e) => {
     e.preventDefault();
     setLoading(true);

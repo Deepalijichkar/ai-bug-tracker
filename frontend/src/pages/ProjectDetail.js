@@ -17,13 +17,14 @@ function ProjectDetail() {
     return { Authorization: `Bearer ${token}` };
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
     const headers = getHeaders();
     axios.get(`${API}/api/projects/${id}`, { headers })
       .then(res => setProject(res.data));
     axios.get(`${API}/api/bugs?project=${id}`, { headers })
       .then(res => setBugs(res.data));
-  }, [id, getHeaders]);
+    // eslint-disable-next-line
+  }, [id]);
 
   const addMember = async (e) => {
     e.preventDefault();
