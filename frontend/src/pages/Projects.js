@@ -13,7 +13,7 @@ function Projects() {
   const headers = { Authorization: `Bearer ${token}` };
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/projects', { headers })
+    axios.get('https://ai-bug-tracker-omega.vercel.app/api/projects', { headers })
       .then(res => setProjects(res.data))
       .catch(err => console.log(err));
   }, []);
@@ -22,7 +22,7 @@ function Projects() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/projects', form, { headers });
+      const res = await axios.post('https://ai-bug-tracker-omega.vercel.app/api/projects', form, { headers });
       setProjects([...projects, res.data]);
       setForm({ name: '', description: '' });
       setShowForm(false);
