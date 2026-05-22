@@ -2,9 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const bugRoutes = require('./routes/bugs');
-const authRoutes = require('./routes/auth');
-const projectRoutes = require('./routes/projects');
 
 dotenv.config();
 
@@ -13,26 +10,30 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-let isConnected = false;
-
 const connectDB = async () => {
-  if (isConnected) return;
+  if (mongoose.connections[0].readyState) return;
   await mongoose.connect(process.env.MONGO_URI);
-  isConnected = true;
-  console.log('MongoDB connected');
 };
 
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ message: 'DB connection failed' });
+  }
 });
+
+const bugRoutes = require('./routes/bugs');
+const authRoutes = require('./routes/auth');
+const projectRoutes = require('./routes/projects');
 
 app.use('/api/bugs', bugRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Bug Tracker API is running');
+  res.json({ message: 'Bug Tracker API is running' });
 });
 
 module.exports = app;
